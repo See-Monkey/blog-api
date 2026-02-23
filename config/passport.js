@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import userModel from "../models/userModel.js";
+import userService from "../models/userService.js";
 
 export function configurePassport() {
 	const opts = {
@@ -11,11 +11,11 @@ export function configurePassport() {
 	passport.use(
 		new JwtStrategy(opts, async (payload, done) => {
 			try {
-				const user = await userModel.findById(payload.id);
+				const user = await userService.findById(payload.id);
 
 				if (!user) return done(null, false);
 
-				return done(null, userModel.sanitizeUser(user));
+				return done(null, userService.sanitizeUser(user));
 			} catch (err) {
 				return done(err, false);
 			}

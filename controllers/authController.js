@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import userModel from "../models/userModel.js";
+import userService from "../models/userService.js";
 
 function generateToken(user) {
 	return jwt.sign(
@@ -14,8 +14,8 @@ function generateToken(user) {
 
 async function register(req, res, next) {
 	try {
-		const user = await userModel.create(req.body);
-		const sanitized = userModel.sanitizeUser(user);
+		const user = await userService.create(req.body);
+		const sanitized = userService.sanitizeUser(user);
 		const token = generateToken(sanitized);
 
 		res.status(201).json({
@@ -31,13 +31,13 @@ async function login(req, res, next) {
 	try {
 		const { username, password } = req.body;
 
-		const user = await userModel.findByUsername(username);
+		const user = await userService.findByUsername(username);
 		if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-		const valid = await userModel.validatePassword(user, password);
+		const valid = await userService.validatePassword(user, password);
 		if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
-		const sanitized = userModel.sanitizeUser(user);
+		const sanitized = userService.sanitizeUser(user);
 		const token = generateToken(sanitized);
 
 		res.json({

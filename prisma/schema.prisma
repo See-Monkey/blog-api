@@ -13,23 +13,58 @@ enum Role {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  username   String   @unique
-  password   String
-  firstname  String?
-  lastname   String?
-  role       Role   @default(USER)
-  avatarUrl  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  posts      Post[]
+  id        String  @id @default(uuid())
+  username  String  @unique
+  password  String
+  firstname String?
+  lastname  String?
+  role      Role    @default(USER)
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts    Post[]
+  comments Comment[]
+
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Post {
-  id        String     @id @default(uuid())
+  id        String  @id @default(uuid())
   title     String
+  slug      String  @unique
   content   String?
   published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  comments Comment[]
+
+  @@index([authorId])
+  @@index([published])
+  @@index([createdAt])
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([createdAt])
 }
