@@ -11,21 +11,30 @@ import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 
-// cross origin resource sharing
+// Cross origin resource sharing
 app.use(
 	cors({
 		origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : "*",
 	}),
 );
 
-// parse JSON payload into req.body
+// Parse JSON payload into req.body
 app.use(express.json());
 
-// setup passport
+// Setup passport
 configurePassport();
 app.use(passport.initialize());
 
-// custom routers
+// Health check
+app.get("/", (req, res) => {
+	res.json({
+		name: "Blog API",
+		version: "1.0.0",
+		status: "OK",
+	});
+});
+
+// Custom routers
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
@@ -36,10 +45,10 @@ app.use((req, res) => {
 	res.status(404).json({ message: "Route not found" });
 });
 
-// catch middleware errors
+// Catch middleware errors
 app.use(errorHandler);
 
-// server
+// Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
