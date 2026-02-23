@@ -16,12 +16,12 @@ router.patch("/me/password", requireAuth, userController.changeMyPassword);
 router.get("/", requireAdmin, userController.getAllUsers);
 
 // Get public profile
-router.get("/:id", userController.getPublicProfile);
+router.get("/:userId", userController.getPublicProfile);
 
 // Admin delete user
-router.delete("/:id", requireAdmin, userController.deleteUser);
+router.delete("/:userId", requireAdmin, userController.deleteUser);
 
 // Get comments by user
-router.get("/:id/comments", commentController.getCommentsByUser);
+router.get("/:userId/comments", commentController.getCommentsByUser);
 
 export default router;

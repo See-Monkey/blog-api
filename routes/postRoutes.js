@@ -9,21 +9,21 @@ const router = Router();
 router.get("/", postController.getAllPosts);
 
 // Get post by ID
-router.get("/:id", postController.getPostById);
+router.get("/:postId", postController.getPostById);
 
 // Submit new post
 router.post("/", requireAdmin, postController.createPost);
 
 // Edit post
-router.patch("/:id", requireAdmin, postController.updatePost);
+router.patch("/:postId", requireAdmin, postController.updatePost);
 
 // Delete post
-router.delete("/:id", requireAdmin, postController.deletePost);
+router.delete("/:postId", requireAdmin, postController.deletePost);
 
 // Get comments by post
-router.get("/:id/comments", commentController.getCommentsByPost);
+router.get("/:postId/comments", commentController.getCommentsByPost);
 
 // Submit comment on post
-router.post("/:id/comments", requireAuth, commentController.createComment);
+router.post("/:postId/comments", requireAuth, commentController.createComment);
 
 export default router;

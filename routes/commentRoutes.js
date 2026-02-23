@@ -5,9 +5,9 @@ import commentController from "../controllers/commentController.js";
 const router = Router();
 
 // Edit comment
-router.patch("/:id", requireAuth, commentController.updateComment);
+router.patch("/:commentId", requireAuth, commentController.updateComment);
 
 // Delete comment
-router.delete(":/id", requireAuth, commentController.deleteComment);
+router.delete("/:commentId", requireAuth, commentController.deleteComment);
 
 export default router;
