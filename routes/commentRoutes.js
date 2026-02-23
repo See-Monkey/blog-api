@@ -4,14 +4,10 @@ import commentController from "../controllers/commentController.js";
 
 const router = Router();
 
-// Get comments by post
-
-// Get comments by user
-
-// Submit new comment
-
 // Edit comment
+router.patch("/:id", requireAuth, commentController.updateComment);
 
 // Delete comment
+router.delete(":/id", requireAuth, commentController.deleteComment);
 
 export default router;

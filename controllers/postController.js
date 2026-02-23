@@ -7,10 +7,10 @@ async function getAllPosts() {}
 async function getPostById() {}
 
 // Submit new post
-async function newPost() {}
+async function createPost() {}
 
 // Edit post
-async function editPost() {}
+async function updatePost() {}
 
 // Delete post
 async function deletePost() {}
@@ -18,7 +18,7 @@ async function deletePost() {}
 export default {
 	getAllPosts,
 	getPostById,
-	newPost,
-	editPost,
+	createPost,
+	updatePost,
 	deletePost,
 };

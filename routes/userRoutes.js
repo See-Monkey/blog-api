@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import userController from "../controllers/userController.js";
+import commentController from "../controllers/commentController.js";
 
 const router = Router();
 
@@ -19,5 +20,8 @@ router.get("/:id", userController.getPublicProfile);
 
 // Admin delete user
 router.delete("/:id", requireAdmin, userController.deleteUser);
+
+// Get comments by user
+router.get("/:id/comments", commentController.getCommentsByUser);
 
 export default router;
