@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import userService from "../models/userService.js";
+import userService from "../services/userService.js";
 
 export function configurePassport() {
 	const opts = {

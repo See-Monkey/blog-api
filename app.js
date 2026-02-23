@@ -3,8 +3,10 @@ import express from "express";
 import cors from "cors";
 import passport from "passport";
 import { configurePassport } from "./config/passport.js";
-import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -26,6 +28,8 @@ app.use(passport.initialize());
 // custom routers
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
 
 // 404 for no routes found
 app.use((req, res) => {

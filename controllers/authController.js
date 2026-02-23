@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import userService from "../models/userService.js";
+import userService from "../services/userService.js";
 
 function generateToken(user) {
 	return jwt.sign(
