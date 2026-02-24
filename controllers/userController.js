@@ -27,7 +27,7 @@ async function changeMyPassword(req, res, next) {
 
 async function getPublicProfile(req, res, next) {
 	try {
-		const user = await userService.findPublicById(req.params.id);
+		const user = await userService.findPublicById(req.params.userId);
 		if (!user) return res.status(404).json({ message: "User not found" });
 		res.json(user);
 	} catch (err) {
@@ -48,7 +48,7 @@ async function getAllUsers(req, res, next) {
 // admin only
 async function deleteUser(req, res, next) {
 	try {
-		await userService.remove(req.params.id);
+		await userService.remove(req.params.userId);
 		res.status(204).end();
 	} catch (err) {
 		next(err);
