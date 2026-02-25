@@ -3,7 +3,14 @@ import commentService from "../services/commentService.js";
 // Get comments by post
 async function getCommentsByPost(req, res, next) {
 	try {
-		const comments = await commentService.getByPost(req.params.postId);
+		const { slug } = req.params;
+
+		const comments = await commentService.getByPostSlug(slug);
+
+		if (!comments) {
+			return res.status(404).json({ message: "Post not found" });
+		}
+
 		res.json(comments);
 	} catch (err) {
 		next(err);
@@ -23,11 +30,18 @@ async function getCommentsByUser(req, res, next) {
 // Submit new comment
 async function createComment(req, res, next) {
 	try {
-		const comment = await commentService.create({
+		const { slug } = req.params;
+
+		const comment = await commentService.createForPostSlug({
 			content: req.body.content,
 			authorId: req.user.id,
-			postId: req.params.postId,
+			slug,
 		});
+
+		if (!comment) {
+			return res.status(404).json({ message: "Post not found" });
+		}
+
 		res.status(201).json(comment);
 	} catch (err) {
 		next(err);

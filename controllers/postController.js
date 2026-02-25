@@ -20,10 +20,10 @@ async function getAllPosts(req, res, next) {
 	}
 }
 
-// Get public post by ID
-async function getPublicPostById(req, res, next) {
+// Get public post by slug
+async function getPublicPostBySlug(req, res, next) {
 	try {
-		const post = await postService.findPublicById(req.params.postId);
+		const post = await postService.findPublicBySlug(req.params.slug);
 		if (!post) {
 			return res.status(404).json({ message: "Post not found" });
 		}
@@ -82,7 +82,7 @@ async function deletePost(req, res, next) {
 export default {
 	getAllPublicPosts,
 	getAllPosts,
-	getPublicPostById,
+	getPublicPostBySlug,
 	getPostById,
 	createPost,
 	updatePost,

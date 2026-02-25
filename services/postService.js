@@ -1,4 +1,25 @@
+import generateBaseSlug from "../utils/slug.js";
 import { prisma } from "../config/prisma.js";
+
+async function generateUniqueSlug(title) {
+	const baseSlug = generateBaseSlug(title);
+
+	let slug = baseSlug;
+	let counter = 1;
+
+	while (true) {
+		const existing = await prisma.post.findUnique({
+			where: { slug },
+		});
+
+		if (!existing) break;
+
+		counter++;
+		slug = `${baseSlug}-${counter}`;
+	}
+
+	return slug;
+}
 
 // Get all published posts (public)
 async function getAllPublic() {
@@ -38,9 +59,12 @@ async function getAll() {
 }
 
 // Get public post by ID
-async function findPublicById(id) {
+async function findPublicBySlug(slug) {
 	return prisma.post.findFirst({
-		where: { id, published: true },
+		where: {
+			slug,
+			published: true,
+		},
 		include: {
 			author: {
 				select: {
@@ -102,7 +126,9 @@ async function findById(id) {
 }
 
 // Create new post (admin)
-async function create({ title, slug, content, published, authorId }) {
+async function create({ title, content, published, authorId }) {
+	const slug = await generateUniqueSlug(title);
+
 	return prisma.post.create({
 		data: {
 			title,
@@ -116,15 +142,32 @@ async function create({ title, slug, content, published, authorId }) {
 
 // Update post (admin)
 async function update(id, data) {
-	const allowedFields = ["title", "slug", "content", "published"];
+	const existing = await prisma.post.findUnique({
+		where: { id },
+	});
 
-	const filteredData = Object.fromEntries(
-		Object.entries(data).filter(([key]) => allowedFields.includes(key)),
-	);
+	if (!existing) {
+		throw new Error("Post not found");
+	}
+
+	const updateData = {};
+
+	if (typeof data.title === "string" && data.title !== existing.title) {
+		updateData.title = data.title;
+		updateData.slug = await generateUniqueSlug(data.title);
+	}
+
+	if (typeof data.content === "string") {
+		updateData.content = data.content;
+	}
+
+	if (typeof data.published === "boolean") {
+		updateData.published = data.published;
+	}
 
 	return prisma.post.update({
 		where: { id },
-		data: filteredData,
+		data: updateData,
 	});
 }
 
@@ -138,7 +181,7 @@ async function remove(id) {
 export default {
 	getAllPublic,
 	getAll,
-	findPublicById,
+	findPublicBySlug,
 	findById,
 	create,
 	update,
