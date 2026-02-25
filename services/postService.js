@@ -36,6 +36,24 @@ async function getAllPublic() {
 					avatarUrl: true,
 				},
 			},
+			comments: {
+				orderBy: { createdAt: "desc" },
+				take: 3,
+				include: {
+					author: {
+						select: {
+							id: true,
+							username: true,
+							firstname: true,
+							lastname: true,
+							avatarUrl: true,
+						},
+					},
+				},
+			},
+			_count: {
+				select: { comments: true },
+			},
 		},
 	});
 }
@@ -53,6 +71,9 @@ async function getAll() {
 					lastname: true,
 					avatarUrl: true,
 				},
+			},
+			_count: {
+				select: { comments: true },
 			},
 		},
 	});
@@ -75,25 +96,14 @@ async function findPublicBySlug(slug) {
 					avatarUrl: true,
 				},
 			},
-			comments: {
-				orderBy: { createdAt: "desc" },
-				include: {
-					author: {
-						select: {
-							id: true,
-							username: true,
-							firstname: true,
-							lastname: true,
-							avatarUrl: true,
-						},
-					},
-				},
+			_count: {
+				select: { comments: true },
 			},
 		},
 	});
 }
 
-// Get post by ID
+// Get post by ID (admin)
 async function findById(id) {
 	return prisma.post.findUnique({
 		where: { id },
@@ -107,19 +117,8 @@ async function findById(id) {
 					avatarUrl: true,
 				},
 			},
-			comments: {
-				orderBy: { createdAt: "desc" },
-				include: {
-					author: {
-						select: {
-							id: true,
-							username: true,
-							firstname: true,
-							lastname: true,
-							avatarUrl: true,
-						},
-					},
-				},
+			_count: {
+				select: { comments: true },
 			},
 		},
 	});
