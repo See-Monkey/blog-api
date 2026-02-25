@@ -1,5 +1,10 @@
 import { Router } from "express";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import {
+	validateUpdateMe,
+	validateChangePassword,
+	handleValidationErrors,
+} from "../middleware/validators.js";
 import userController from "../controllers/userController.js";
 import commentController from "../controllers/commentController.js";
 
@@ -9,8 +14,20 @@ const router = Router();
 router.get("/me", requireAuth, userController.getMe);
 
 // Update account details
-router.patch("/me", requireAuth, userController.updateMe);
-router.patch("/me/password", requireAuth, userController.changeMyPassword);
+router.patch(
+	"/me",
+	requireAuth,
+	validateUpdateMe,
+	handleValidationErrors,
+	userController.updateMe,
+);
+router.patch(
+	"/me/password",
+	requireAuth,
+	validateChangePassword,
+	handleValidationErrors,
+	userController.changeMyPassword,
+);
 
 // Admin get all users
 router.get("/", requireAdmin, userController.getAllUsers);
