@@ -1,32 +1,58 @@
+import bcrypt from "bcryptjs";
 import { prisma } from "./prisma.js";
 
 async function main() {
-	// Create a new user with a post
+	// Wipe database
+	await prisma.comment.deleteMany();
+	await prisma.post.deleteMany();
+	await prisma.user.deleteMany();
+
+	// Create admin
+	const hashedPassword = await bcrypt.hash("MyPassword123!", 10);
+
 	const user = await prisma.user.create({
 		data: {
-			name: "Alice",
-			email: "alice@prisma.io",
-			posts: {
-				create: {
-					title: "Hello World",
-					content: "This is my first post!",
-					published: true,
-				},
-			},
-		},
-		include: {
-			posts: true,
+			username: "admin@example.com",
+			password: hashedPassword,
+			firstname: "Admin",
+			lastname: "User",
+			role: "ADMIN",
 		},
 	});
-	console.log("Created user:", user);
 
-	// Fetch all users with their posts
-	const allUsers = await prisma.user.findMany({
-		include: {
-			posts: true,
+	const post = await prisma.post.create({
+		data: {
+			title: "Welcome to the Blog",
+			slug: "welcome-to-the-blog",
+			content: "This is the first seeded post in the system.",
+			published: true,
+			authorId: user.id,
 		},
 	});
-	console.log("All users:", JSON.stringify(allUsers, null, 2));
+
+	// Create regular user
+	const userPassword = await bcrypt.hash("UserPassword123!", 10);
+
+	const regularUser = await prisma.user.create({
+		data: {
+			username: "user@example.com",
+			password: userPassword,
+			firstname: "Regular",
+			lastname: "User",
+			role: "USER",
+		},
+	});
+
+	// Create comment
+	await prisma.comment.create({
+		data: {
+			content: "This is a seeded comment from a regular user.",
+			authorId: regularUser.id,
+			postId: post.id,
+		},
+	});
+
+	console.log("Database successfully seeded.");
 }
 
 main()
