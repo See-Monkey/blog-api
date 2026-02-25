@@ -5,11 +5,17 @@ import commentController from "../controllers/commentController.js";
 
 const router = Router();
 
-// Get all posts
-router.get("/", postController.getAllPosts);
+// Get all public posts
+router.get("/", postController.getAllPublicPosts);
 
-// Get post by ID
-router.get("/:postId", postController.getPostById);
+// Get all posts (admin)
+router.get("/admin", requireAdmin, postController.getAllPosts);
+
+// Get public post by ID
+router.get("/:postId", postController.getPublicPostById);
+
+// Get any post by ID (admin)
+router.get("/admin/:postId", requireAdmin, postController.getPostById);
 
 // Submit new post
 router.post("/", requireAdmin, postController.createPost);

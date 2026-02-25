@@ -1,10 +1,33 @@
 import postService from "../services/postService.js";
 
 // Get all posts
+async function getAllPublicPosts(req, res, next) {
+	try {
+		const posts = await postService.getAllPublic();
+		res.json(posts);
+	} catch (err) {
+		next(err);
+	}
+}
+
+// Get all posts
 async function getAllPosts(req, res, next) {
 	try {
 		const posts = await postService.getAll();
 		res.json(posts);
+	} catch (err) {
+		next(err);
+	}
+}
+
+// Get public post by ID
+async function getPublicPostById(req, res, next) {
+	try {
+		const post = await postService.findPublicById(req.params.postId);
+		if (!post) {
+			return res.status(404).json({ message: "Post not found" });
+		}
+		res.json(post);
 	} catch (err) {
 		next(err);
 	}
@@ -57,7 +80,9 @@ async function deletePost(req, res, next) {
 }
 
 export default {
+	getAllPublicPosts,
 	getAllPosts,
+	getPublicPostById,
 	getPostById,
 	createPost,
 	updatePost,

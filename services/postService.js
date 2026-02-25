@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma.js";
 
 // Get all published posts (public)
-async function getAll() {
+async function getAllPublic() {
 	return prisma.post.findMany({
 		where: { published: true },
 		orderBy: { createdAt: "desc" },
@@ -20,6 +20,54 @@ async function getAll() {
 }
 
 // Get all posts (admin)
+async function getAll() {
+	return prisma.post.findMany({
+		orderBy: { createdAt: "desc" },
+		include: {
+			author: {
+				select: {
+					id: true,
+					username: true,
+					firstname: true,
+					lastname: true,
+					avatarUrl: true,
+				},
+			},
+		},
+	});
+}
+
+// Get public post by ID
+async function findPublicById(id) {
+	return prisma.post.findFirst({
+		where: { id, published: true },
+		include: {
+			author: {
+				select: {
+					id: true,
+					username: true,
+					firstname: true,
+					lastname: true,
+					avatarUrl: true,
+				},
+			},
+			comments: {
+				orderBy: { createdAt: "desc" },
+				include: {
+					author: {
+						select: {
+							id: true,
+							username: true,
+							firstname: true,
+							lastname: true,
+							avatarUrl: true,
+						},
+					},
+				},
+			},
+		},
+	});
+}
 
 // Get post by ID
 async function findById(id) {
@@ -88,7 +136,9 @@ async function remove(id) {
 }
 
 export default {
+	getAllPublic,
 	getAll,
+	findPublicById,
 	findById,
 	create,
 	update,
