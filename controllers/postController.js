@@ -1,19 +1,25 @@
 import postService from "../services/postService.js";
 
-// Get all posts
+// Get all public posts
 async function getAllPublicPosts(req, res, next) {
 	try {
-		const posts = await postService.getAllPublic();
+		const page = Math.max(1, Number(req.query.page) || 1);
+		const limit = Math.min(60, Number(req.query.limit) || 20);
+
+		const posts = await postService.getAllPublic({ page, limit });
 		res.json(posts);
 	} catch (err) {
 		next(err);
 	}
 }
 
-// Get all posts
+// Get all posts (admin)
 async function getAllPosts(req, res, next) {
 	try {
-		const posts = await postService.getAll();
+		const page = Math.max(1, Number(req.query.page) || 1);
+		const limit = Math.min(60, Number(req.query.limit) || 20);
+
+		const posts = await postService.getAll({ page, limit });
 		res.json(posts);
 	} catch (err) {
 		next(err);

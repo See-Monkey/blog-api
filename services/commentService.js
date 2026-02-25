@@ -13,7 +13,7 @@ async function getPostIdFromSlug(slug) {
 }
 
 // Get comments by post
-async function getByPostSlug(slug) {
+async function getByPostSlug({ slug, page, limit }) {
 	const postId = await getPostIdFromSlug(slug);
 
 	if (!postId) return null;
@@ -21,6 +21,8 @@ async function getByPostSlug(slug) {
 	return prisma.comment.findMany({
 		where: { postId },
 		orderBy: { createdAt: "desc" },
+		skip: (page - 1) * limit,
+		take: limit,
 		include: {
 			author: {
 				select: {
@@ -36,7 +38,7 @@ async function getByPostSlug(slug) {
 }
 
 // Get comments by user
-async function getByUser(userId) {
+async function getByUser({ userId, page, limit }) {
 	return prisma.comment.findMany({
 		where: {
 			authorId: userId,
@@ -45,6 +47,8 @@ async function getByUser(userId) {
 			},
 		},
 		orderBy: { createdAt: "desc" },
+		skip: (page - 1) * limit,
+		take: limit,
 		include: {
 			post: {
 				select: {

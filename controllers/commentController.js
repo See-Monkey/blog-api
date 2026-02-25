@@ -3,9 +3,16 @@ import commentService from "../services/commentService.js";
 // Get comments by post
 async function getCommentsByPost(req, res, next) {
 	try {
+		const page = Math.max(1, Number(req.query.page) || 1);
+		const limit = Math.min(60, Number(req.query.limit) || 20);
+
 		const { slug } = req.params;
 
-		const comments = await commentService.getByPostSlug(slug);
+		const comments = await commentService.getByPostSlug({
+			slug,
+			page,
+			limit,
+		});
 
 		if (!comments) {
 			return res.status(404).json({ message: "Post not found" });
@@ -20,7 +27,14 @@ async function getCommentsByPost(req, res, next) {
 // Get comments by user
 async function getCommentsByUser(req, res, next) {
 	try {
-		const comments = await commentService.getByUser(req.params.userId);
+		const page = Math.max(1, Number(req.query.page) || 1);
+		const limit = Math.min(60, Number(req.query.limit) || 20);
+
+		const comments = await commentService.getByUser({
+			userId: req.params.userId,
+			page,
+			limit,
+		});
 		res.json(comments);
 	} catch (err) {
 		next(err);

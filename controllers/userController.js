@@ -38,7 +38,10 @@ async function getPublicProfile(req, res, next) {
 // admin only
 async function getAllUsers(req, res, next) {
 	try {
-		const users = await userService.getAll();
+		const page = Math.max(1, Number(req.query.page) || 1);
+		const limit = Math.min(60, Number(req.query.limit) || 20);
+
+		const users = await userService.getAll({ page, limit });
 		res.json(users);
 	} catch (err) {
 		next(err);

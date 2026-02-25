@@ -98,7 +98,7 @@ async function remove(id) {
 }
 
 // Get all users
-async function getAll() {
+async function getAll({ page, limit }) {
 	return prisma.user.findMany({
 		select: {
 			id: true,
@@ -108,6 +108,9 @@ async function getAll() {
 			role: true,
 			createdAt: true,
 		},
+		orderBy: { createdAt: "desc" },
+		skip: (page - 1) * limit,
+		take: limit,
 	});
 }
 
