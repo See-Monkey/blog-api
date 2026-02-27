@@ -1,4 +1,13 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+
+const env = process.env.NODE_ENV || "development";
+
+if (env === "test") {
+	dotenv.config({ path: ".env.test" });
+} else if (env === "development") {
+	dotenv.config(); // load .env
+}
+
 import express from "express";
 import cors from "cors";
 import passport from "passport";
