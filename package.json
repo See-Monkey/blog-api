@@ -13,6 +13,14 @@
 		"prisma:migrate": "prisma migrate dev",
 		"prisma:deploy": "prisma migrate deploy"
 	},
+	"jest": {
+		"setupFiles": [
+			"./config/env.js"
+		],
+		"setupFilesAfterEnv": [
+			"./tests/setup.js"
+		]
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/See-Monkey/blog-api.git"
