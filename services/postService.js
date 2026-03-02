@@ -22,61 +22,91 @@ async function generateUniqueSlug(title) {
 }
 
 // Get all published posts (public)
-async function getAllPublic() {
-	return prisma.post.findMany({
-		where: { published: true },
-		orderBy: { createdAt: "desc" },
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
+async function getAllPublic({ page, limit }) {
+	const skip = (page - 1) * limit;
+
+	const [posts, totalCount] = await Promise.all([
+		prisma.post.findMany({
+			where: { published: true },
+			orderBy: { createdAt: "desc" },
+			skip,
+			take: limit,
+			include: {
+				author: {
+					select: {
+						id: true,
+						username: true,
+						firstname: true,
+						lastname: true,
+						avatarUrl: true,
+					},
 				},
-			},
-			comments: {
-				orderBy: { createdAt: "desc" },
-				take: 3,
-				include: {
-					author: {
-						select: {
-							id: true,
-							username: true,
-							firstname: true,
-							lastname: true,
-							avatarUrl: true,
+				comments: {
+					orderBy: { createdAt: "desc" },
+					take: 3,
+					include: {
+						author: {
+							select: {
+								id: true,
+								username: true,
+								firstname: true,
+								lastname: true,
+								avatarUrl: true,
+							},
 						},
 					},
 				},
+				_count: {
+					select: { comments: true },
+				},
 			},
-			_count: {
-				select: { comments: true },
-			},
-		},
-	});
+		}),
+		prisma.post.count({
+			where: { published: true },
+		}),
+	]);
+
+	return {
+		posts,
+		totalCount,
+		totalPages: Math.ceil(totalCount / limit),
+		currentPage: page,
+	};
 }
 
 // Get all posts (admin)
-async function getAll() {
-	return prisma.post.findMany({
-		orderBy: { createdAt: "desc" },
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
+async function getAll({ page, limit }) {
+	const skip = (page - 1) * limit;
+
+	const [posts, totalCount] = await Promise.all([
+		prisma.post.findMany({
+			orderBy: { createdAt: "desc" },
+			skip,
+			take: limit,
+			include: {
+				author: {
+					select: {
+						id: true,
+						username: true,
+						firstname: true,
+						lastname: true,
+						avatarUrl: true,
+					},
+				},
+				_count: {
+					select: { comments: true },
 				},
 			},
-			_count: {
-				select: { comments: true },
-			},
-		},
-	});
+		}),
+		prisma.post.count(),
+	]);
+
+	return {
+		posts,
+		totalCount,
+		totalPages: Math.ceil(totalCount / limit),
+		currentPage: page,
+	};
 }
 
 // Get public post by ID
