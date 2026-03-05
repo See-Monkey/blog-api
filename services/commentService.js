@@ -18,23 +18,37 @@ async function getByPostSlug({ slug, page, limit }) {
 
 	if (!postId) return null;
 
-	return prisma.comment.findMany({
-		where: { postId },
-		orderBy: { createdAt: "desc" },
-		skip: (page - 1) * limit,
-		take: limit,
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
+	const skip = (page - 1) * limit;
+
+	const [comments, totalCount] = await Promise.all([
+		prisma.comment.findMany({
+			where: { postId },
+			orderBy: { createdAt: "desc" },
+			skip: (page - 1) * limit,
+			take: limit,
+			include: {
+				author: {
+					select: {
+						id: true,
+						username: true,
+						firstname: true,
+						lastname: true,
+						avatarUrl: true,
+					},
 				},
 			},
-		},
-	});
+		}),
+		prisma.comment.count({
+			where: { postId: postId },
+		}),
+	]);
+
+	return {
+		comments,
+		totalCount,
+		totalPages: Math.ceil(totalCount / limit),
+		currentPage: page,
+	};
 }
 
 // Get comments by user
