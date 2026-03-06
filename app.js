@@ -9,6 +9,7 @@ import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
+import userService from "./services/userService.js";
 
 const app = express();
 
@@ -40,6 +41,16 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+
+// Analytics
+app.get("/api/analytics", async (req, res, next) => {
+	try {
+		const data = await userService.getAnalytics();
+		res.json(data);
+	} catch (err) {
+		next(err);
+	}
+});
 
 // 404 for no routes found
 app.use((req, res) => {
