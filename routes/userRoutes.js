@@ -35,8 +35,8 @@ router.get("/", requireAdmin, userController.getAllUsers);
 // Get public profile
 router.get("/:userId", userController.getPublicProfile);
 
-// Admin delete user
-router.delete("/:userId", requireAdmin, userController.deleteUser);
+// Admin or self delete user
+router.delete("/:userId", requireAuth, userController.deleteUser);
 
 // Get comments by user
 router.get("/:userId/comments", commentController.getCommentsByUser);

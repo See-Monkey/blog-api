@@ -48,10 +48,21 @@ async function getAllUsers(req, res, next) {
 	}
 }
 
-// admin only
+// admin or self only
 async function deleteUser(req, res, next) {
 	try {
-		await userService.remove(req.params.userId);
+		const { userId } = req.params;
+		const requester = req.user;
+
+		const isAdmin = requester.role === "ADMIN";
+		const isSelf = requester.id === userId;
+
+		if (!isAdmin && !isSelf) {
+			return res.status(403).json({ message: "Forbidden" });
+		}
+
+		await userService.remove(userId);
+
 		res.status(204).end();
 	} catch (err) {
 		next(err);
