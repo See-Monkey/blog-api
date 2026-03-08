@@ -105,6 +105,7 @@ async function getAll({ page, limit }) {
 			username: true,
 			firstname: true,
 			lastname: true,
+			avatarUrl: true,
 			role: true,
 			createdAt: true,
 		},
