@@ -73,7 +73,13 @@ export const validateChangePassword = [
 
 	body("newPassword")
 		.isLength({ min: 8 })
-		.withMessage("Password must be at least 8 characters"),
+		.withMessage("Password must be at least 8 characters")
+		.custom((value, { req }) => {
+			if (value === req.body.currentPassword) {
+				throw new Error("New password must be different from current password");
+			}
+			return true;
+		}),
 ];
 
 export const validateCreatePost = [
