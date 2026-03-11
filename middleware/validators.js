@@ -22,19 +22,19 @@ export const validateRegister = [
 		}),
 
 	body("firstname")
-		.optional()
+		.optional({ values: "falsy" })
 		.trim()
 		.isLength({ min: 1, max: 30 })
 		.withMessage("First name must be between 1 and 30 characters"),
 
 	body("lastname")
-		.optional()
+		.optional({ values: "falsy" })
 		.trim()
 		.isLength({ min: 1, max: 30 })
 		.withMessage("Last name must be between 1 and 30 characters"),
 
 	body("avatarUrl")
-		.optional()
+		.optional({ values: "falsy" })
 		.isURL()
 		.withMessage("Avatar must be a valid URL"),
 ];
@@ -51,19 +51,19 @@ export const validateLogin = [
 
 export const validateUpdateMe = [
 	body("firstname")
-		.optional()
+		.optional({ values: "falsy" })
 		.trim()
 		.isLength({ min: 1, max: 30 })
 		.withMessage("First name must be between 1 and 30 characters"),
 
 	body("lastname")
-		.optional()
+		.optional({ values: "falsy" })
 		.trim()
 		.isLength({ min: 1, max: 30 })
 		.withMessage("Last name must be between 1 and 30 characters"),
 
 	body("avatarUrl")
-		.optional()
+		.optional({ values: "falsy" })
 		.isURL()
 		.withMessage("Avatar must be a valid URL"),
 ];
@@ -74,16 +74,6 @@ export const validateChangePassword = [
 	body("newPassword")
 		.isLength({ min: 8 })
 		.withMessage("Password must be at least 8 characters"),
-
-	body("confirmPassword")
-		.notEmpty()
-		.withMessage("Confirm password required")
-		.custom((value, { req }) => {
-			if (value !== req.body.newPassword) {
-				throw new Error("Passwords do not match");
-			}
-			return true;
-		}),
 ];
 
 export const validateCreatePost = [
