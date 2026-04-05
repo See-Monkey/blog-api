@@ -2,217 +2,217 @@ import generateBaseSlug from "../utils/slug.js";
 import { prisma } from "../config/prisma.js";
 
 async function generateUniqueSlug(title) {
-	const baseSlug = generateBaseSlug(title);
+  const baseSlug = generateBaseSlug(title);
 
-	let slug = baseSlug;
-	let counter = 1;
+  let slug = baseSlug;
+  let counter = 1;
 
-	while (true) {
-		const existing = await prisma.post.findUnique({
-			where: { slug },
-		});
+  while (true) {
+    const existing = await prisma.post.findUnique({
+      where: { slug },
+    });
 
-		if (!existing) break;
+    if (!existing) break;
 
-		counter++;
-		slug = `${baseSlug}-${counter}`;
-	}
+    counter++;
+    slug = `${baseSlug}-${counter}`;
+  }
 
-	return slug;
+  return slug;
 }
 
 // Get all published posts (public)
 async function getAllPublic({ page, limit }) {
-	const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-	const [posts, totalCount] = await Promise.all([
-		prisma.post.findMany({
-			where: { published: true },
-			orderBy: { createdAt: "desc" },
-			skip,
-			take: limit,
-			include: {
-				author: {
-					select: {
-						id: true,
-						username: true,
-						firstname: true,
-						lastname: true,
-						avatarUrl: true,
-					},
-				},
-				comments: {
-					orderBy: { createdAt: "desc" },
-					take: 3,
-					include: {
-						author: {
-							select: {
-								id: true,
-								username: true,
-								firstname: true,
-								lastname: true,
-								avatarUrl: true,
-							},
-						},
-					},
-				},
-				_count: {
-					select: { comments: true },
-				},
-			},
-		}),
-		prisma.post.count({
-			where: { published: true },
-		}),
-	]);
+  const [posts, totalCount] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            avatarUrl: true,
+          },
+        },
+        comments: {
+          orderBy: { createdAt: "desc" },
+          take: 3,
+          include: {
+            author: {
+              select: {
+                id: true,
+                username: true,
+                firstname: true,
+                lastname: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: { comments: true },
+        },
+      },
+    }),
+    prisma.post.count({
+      where: { published: true },
+    }),
+  ]);
 
-	return {
-		posts,
-		totalCount,
-		totalPages: Math.ceil(totalCount / limit),
-		currentPage: page,
-	};
+  return {
+    posts,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 
 // Get all posts (admin)
 async function getAll({ page, limit }) {
-	const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-	const [posts, totalCount] = await Promise.all([
-		prisma.post.findMany({
-			orderBy: { createdAt: "desc" },
-			skip,
-			take: limit,
-			include: {
-				author: {
-					select: {
-						id: true,
-						username: true,
-						firstname: true,
-						lastname: true,
-						avatarUrl: true,
-					},
-				},
-				_count: {
-					select: { comments: true },
-				},
-			},
-		}),
-		prisma.post.count(),
-	]);
+  const [posts, totalCount] = await Promise.all([
+    prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            avatarUrl: true,
+          },
+        },
+        _count: {
+          select: { comments: true },
+        },
+      },
+    }),
+    prisma.post.count(),
+  ]);
 
-	return {
-		posts,
-		totalCount,
-		totalPages: Math.ceil(totalCount / limit),
-		currentPage: page,
-	};
+  return {
+    posts,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 
 // Get public post by ID
 async function findPublicBySlug(slug) {
-	return prisma.post.findFirst({
-		where: {
-			slug,
-			published: true,
-		},
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
-				},
-			},
-			_count: {
-				select: { comments: true },
-			},
-		},
-	});
+  return prisma.post.findFirst({
+    where: {
+      slug,
+      published: true,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          firstname: true,
+          lastname: true,
+          avatarUrl: true,
+        },
+      },
+      _count: {
+        select: { comments: true },
+      },
+    },
+  });
 }
 
 // Get post by ID (admin)
 async function findById(id) {
-	return prisma.post.findUnique({
-		where: { id },
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
-				},
-			},
-			_count: {
-				select: { comments: true },
-			},
-		},
-	});
+  return prisma.post.findUnique({
+    where: { id },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          firstname: true,
+          lastname: true,
+          avatarUrl: true,
+        },
+      },
+      _count: {
+        select: { comments: true },
+      },
+    },
+  });
 }
 
 // Create new post (admin)
 async function create({ title, content, published, authorId }) {
-	const slug = await generateUniqueSlug(title);
+  const slug = await generateUniqueSlug(title);
 
-	return prisma.post.create({
-		data: {
-			title,
-			slug,
-			content,
-			published: !!published,
-			authorId,
-		},
-	});
+  return prisma.post.create({
+    data: {
+      title,
+      slug,
+      content,
+      published: !!published,
+      authorId,
+    },
+  });
 }
 
 // Update post (admin)
 async function update(id, data) {
-	const existing = await prisma.post.findUnique({
-		where: { id },
-	});
+  const existing = await prisma.post.findUnique({
+    where: { id },
+  });
 
-	if (!existing) {
-		throw new Error("Post not found");
-	}
+  if (!existing) {
+    throw new Error("Post not found");
+  }
 
-	const updateData = {};
+  const updateData = {};
 
-	if (typeof data.title === "string" && data.title !== existing.title) {
-		updateData.title = data.title;
-		updateData.slug = await generateUniqueSlug(data.title);
-	}
+  if (typeof data.title === "string" && data.title !== existing.title) {
+    updateData.title = data.title;
+    updateData.slug = await generateUniqueSlug(data.title);
+  }
 
-	if (typeof data.content === "string") {
-		updateData.content = data.content;
-	}
+  if (typeof data.content === "string") {
+    updateData.content = data.content;
+  }
 
-	if (typeof data.published === "boolean") {
-		updateData.published = data.published;
-	}
+  if (typeof data.published === "boolean") {
+    updateData.published = data.published;
+  }
 
-	return prisma.post.update({
-		where: { id },
-		data: updateData,
-	});
+  return prisma.post.update({
+    where: { id },
+    data: updateData,
+  });
 }
 
 // Delete post (admin)
 async function remove(id) {
-	return prisma.post.delete({
-		where: { id },
-	});
+  return prisma.post.delete({
+    where: { id },
+  });
 }
 
 export default {
-	getAllPublic,
-	getAll,
-	findPublicBySlug,
-	findById,
-	create,
-	update,
-	remove,
+  getAllPublic,
+  getAll,
+  findPublicBySlug,
+  findById,
+  create,
+  update,
+  remove,
 };

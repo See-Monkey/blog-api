@@ -1,79 +1,79 @@
 import userService from "../services/userService.js";
 
 async function getMe(req, res) {
-	res.json(req.user);
+  res.json(req.user);
 }
 
 async function updateMe(req, res, next) {
-	try {
-		const updated = await userService.update(req.user.id, req.body);
-		res.json(updated);
-	} catch (err) {
-		next(err);
-	}
+  try {
+    const updated = await userService.update(req.user.id, req.body);
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function changeMyPassword(req, res, next) {
-	try {
-		const { currentPassword, newPassword } = req.body;
+  try {
+    const { currentPassword, newPassword } = req.body;
 
-		await userService.changePassword(req.user.id, currentPassword, newPassword);
+    await userService.changePassword(req.user.id, currentPassword, newPassword);
 
-		res.json({ message: "Password updated successfully" });
-	} catch (err) {
-		next(err);
-	}
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function getPublicProfile(req, res, next) {
-	try {
-		const user = await userService.findPublicById(req.params.userId);
-		if (!user) return res.status(404).json({ message: "User not found" });
-		res.json(user);
-	} catch (err) {
-		next(err);
-	}
+  try {
+    const user = await userService.findPublicById(req.params.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
 }
 
 // admin only
 async function getAllUsers(req, res, next) {
-	try {
-		const page = Math.max(1, Number(req.query.page) || 1);
-		const limit = Math.min(60, Number(req.query.limit) || 20);
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(60, Number(req.query.limit) || 20);
 
-		const users = await userService.getAll({ page, limit });
-		res.json(users);
-	} catch (err) {
-		next(err);
-	}
+    const users = await userService.getAll({ page, limit });
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
 }
 
 // admin or self only
 async function deleteUser(req, res, next) {
-	try {
-		const { userId } = req.params;
-		const requester = req.user;
+  try {
+    const { userId } = req.params;
+    const requester = req.user;
 
-		const isAdmin = requester.role === "ADMIN";
-		const isSelf = requester.id === userId;
+    const isAdmin = requester.role === "ADMIN";
+    const isSelf = requester.id === userId;
 
-		if (!isAdmin && !isSelf) {
-			return res.status(403).json({ message: "Forbidden" });
-		}
+    if (!isAdmin && !isSelf) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
-		await userService.remove(userId);
+    await userService.remove(userId);
 
-		res.status(204).end();
-	} catch (err) {
-		next(err);
-	}
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
 }
 
 export default {
-	getMe,
-	updateMe,
-	changeMyPassword,
-	getPublicProfile,
-	getAllUsers,
-	deleteUser,
+  getMe,
+  updateMe,
+  changeMyPassword,
+  getPublicProfile,
+  getAllUsers,
+  deleteUser,
 };

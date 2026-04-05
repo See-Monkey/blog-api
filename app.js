@@ -15,9 +15,9 @@ const app = express();
 
 // Cross origin resource sharing
 app.use(
-	cors({
-		origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : "*",
-	}),
+  cors({
+    origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : "*",
+  }),
 );
 
 // Parse JSON payload into req.body
@@ -29,11 +29,11 @@ app.use(passport.initialize());
 
 // Health check
 app.get("/", (req, res) => {
-	res.json({
-		name: "Blog API",
-		version: "1.0.0",
-		status: "OK",
-	});
+  res.json({
+    name: "Blog API",
+    version: "1.0.0",
+    status: "OK",
+  });
 });
 
 // Custom routers
@@ -45,7 +45,7 @@ app.use("/api/analytics", analyticsRoutes);
 
 // 404 for no routes found
 app.use((req, res) => {
-	res.status(404).json({ message: "Route not found" });
+  res.status(404).json({ message: "Route not found" });
 });
 
 // Catch middleware errors

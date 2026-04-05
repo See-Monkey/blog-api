@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import {
-	validateCreatePost,
-	validateUpdatePost,
-	validateCreateComment,
-	validatePostIdParam,
-	validateSlugParam,
-	handleValidationErrors,
+  validateCreatePost,
+  validateUpdatePost,
+  validateCreateComment,
+  validatePostIdParam,
+  validateSlugParam,
+  handleValidationErrors,
 } from "../middleware/validators.js";
 import postController from "../controllers/postController.js";
 import commentController from "../controllers/commentController.js";
@@ -21,65 +21,65 @@ router.get("/admin", requireAdmin, postController.getAllPosts);
 
 // Get any post by ID (admin)
 router.get(
-	"/admin/:postId",
-	requireAdmin,
-	validatePostIdParam,
-	handleValidationErrors,
-	postController.getPostById,
+  "/admin/:postId",
+  requireAdmin,
+  validatePostIdParam,
+  handleValidationErrors,
+  postController.getPostById,
 );
 
 // Submit new post
 router.post(
-	"/",
-	requireAdmin,
-	validateCreatePost,
-	handleValidationErrors,
-	postController.createPost,
+  "/",
+  requireAdmin,
+  validateCreatePost,
+  handleValidationErrors,
+  postController.createPost,
 );
 
 // Edit post (admin)
 router.patch(
-	"/:postId",
-	requireAdmin,
-	validatePostIdParam,
-	validateUpdatePost,
-	handleValidationErrors,
-	postController.updatePost,
+  "/:postId",
+  requireAdmin,
+  validatePostIdParam,
+  validateUpdatePost,
+  handleValidationErrors,
+  postController.updatePost,
 );
 
 // Delete post (admin)
 router.delete(
-	"/:postId",
-	requireAdmin,
-	validatePostIdParam,
-	handleValidationErrors,
-	postController.deletePost,
+  "/:postId",
+  requireAdmin,
+  validatePostIdParam,
+  handleValidationErrors,
+  postController.deletePost,
 );
 
 // Get comments by post
 router.get(
-	"/:slug/comments",
-	validateSlugParam,
-	handleValidationErrors,
-	commentController.getCommentsByPost,
+  "/:slug/comments",
+  validateSlugParam,
+  handleValidationErrors,
+  commentController.getCommentsByPost,
 );
 
 // Submit comment on post
 router.post(
-	"/:slug/comments",
-	requireAuth,
-	validateSlugParam,
-	validateCreateComment,
-	handleValidationErrors,
-	commentController.createComment,
+  "/:slug/comments",
+  requireAuth,
+  validateSlugParam,
+  validateCreateComment,
+  handleValidationErrors,
+  commentController.createComment,
 );
 
 // Get public post by slug
 router.get(
-	"/:slug",
-	validateSlugParam,
-	handleValidationErrors,
-	postController.getPublicPostBySlug,
+  "/:slug",
+  validateSlugParam,
+  handleValidationErrors,
+  postController.getPublicPostBySlug,
 );
 
 export default router;

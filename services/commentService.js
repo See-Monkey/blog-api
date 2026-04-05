@@ -1,152 +1,152 @@
 import { prisma } from "../config/prisma.js";
 
 async function getPostIdFromSlug(slug) {
-	const post = await prisma.post.findFirst({
-		where: {
-			slug,
-			published: true,
-		},
-		select: { id: true },
-	});
+  const post = await prisma.post.findFirst({
+    where: {
+      slug,
+      published: true,
+    },
+    select: { id: true },
+  });
 
-	return post?.id || null;
+  return post?.id || null;
 }
 
 // Get comments by post
 async function getByPostSlug({ slug, page, limit }) {
-	const postId = await getPostIdFromSlug(slug);
+  const postId = await getPostIdFromSlug(slug);
 
-	if (!postId) return null;
+  if (!postId) return null;
 
-	const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-	const [comments, totalCount] = await Promise.all([
-		prisma.comment.findMany({
-			where: { postId },
-			orderBy: { createdAt: "desc" },
-			skip: (page - 1) * limit,
-			take: limit,
-			include: {
-				author: {
-					select: {
-						id: true,
-						username: true,
-						firstname: true,
-						lastname: true,
-						avatarUrl: true,
-					},
-				},
-			},
-		}),
-		prisma.comment.count({
-			where: { postId: postId },
-		}),
-	]);
+  const [comments, totalCount] = await Promise.all([
+    prisma.comment.findMany({
+      where: { postId },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    }),
+    prisma.comment.count({
+      where: { postId: postId },
+    }),
+  ]);
 
-	return {
-		comments,
-		totalCount,
-		totalPages: Math.ceil(totalCount / limit),
-		currentPage: page,
-	};
+  return {
+    comments,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 
 // Get comments by user
 async function getByUser({ userId, page, limit }) {
-	const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-	const [comments, totalCount] = await Promise.all([
-		prisma.comment.findMany({
-			where: {
-				authorId: userId,
-				post: {
-					published: true,
-				},
-			},
-			orderBy: { createdAt: "desc" },
-			skip,
-			take: limit,
-			include: {
-				post: {
-					select: {
-						id: true,
-						title: true,
-						slug: true,
-					},
-				},
-			},
-		}),
-		prisma.comment.count({
-			where: {
-				authorId: userId,
-				post: {
-					published: true,
-				},
-			},
-		}),
-	]);
+  const [comments, totalCount] = await Promise.all([
+    prisma.comment.findMany({
+      where: {
+        authorId: userId,
+        post: {
+          published: true,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        post: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    }),
+    prisma.comment.count({
+      where: {
+        authorId: userId,
+        post: {
+          published: true,
+        },
+      },
+    }),
+  ]);
 
-	return {
-		comments,
-		totalCount,
-		totalPages: Math.ceil(totalCount / limit),
-		currentPage: page,
-	};
+  return {
+    comments,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 
 // Find comment by ID (internal use)
 async function findById(id) {
-	return prisma.comment.findUnique({
-		where: { id },
-	});
+  return prisma.comment.findUnique({
+    where: { id },
+  });
 }
 
 // Create comment
 async function createForPostSlug({ content, authorId, slug }) {
-	const postId = await getPostIdFromSlug(slug);
+  const postId = await getPostIdFromSlug(slug);
 
-	if (!postId) return null;
+  if (!postId) return null;
 
-	return prisma.comment.create({
-		data: {
-			content,
-			authorId,
-			postId,
-		},
-		include: {
-			author: {
-				select: {
-					id: true,
-					username: true,
-					firstname: true,
-					lastname: true,
-					avatarUrl: true,
-				},
-			},
-		},
-	});
+  return prisma.comment.create({
+    data: {
+      content,
+      authorId,
+      postId,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          firstname: true,
+          lastname: true,
+          avatarUrl: true,
+        },
+      },
+    },
+  });
 }
 
 // Update comment
 async function update(id, content) {
-	return prisma.comment.update({
-		where: { id },
-		data: { content },
-	});
+  return prisma.comment.update({
+    where: { id },
+    data: { content },
+  });
 }
 
 // Delete comment
 async function remove(id) {
-	return prisma.comment.delete({
-		where: { id },
-	});
+  return prisma.comment.delete({
+    where: { id },
+  });
 }
 
 export default {
-	getByPostSlug,
-	getByUser,
-	findById,
-	createForPostSlug,
-	update,
-	remove,
+  getByPostSlug,
+  getByUser,
+  findById,
+  createForPostSlug,
+  update,
+  remove,
 };
